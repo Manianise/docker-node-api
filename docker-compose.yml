@@ -1,0 +1,39 @@
+services:
+  mariadb:
+    image: mariadb:noble
+    container_name: mariadb-ctn
+    env_file:
+      - path: ./.env
+        required: false
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb-storage:/var/lib/mysql
+    networks:
+      custom_network:
+        ipv4_address: 172.200.0.2
+
+  nodejs:
+    image: mechameleon/api_nodejs
+    container_name: nodejsctn
+    env_file:
+      - path: ./.env
+        required: false
+    ports:
+      - "5134:5134"  # External:Internal
+    networks:
+      custom_network:
+        ipv4_address: 172.200.0.3
+    depends_on:
+      - mariadb
+      
+
+networks:
+  custom_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.200.0.0/16
+
+volumes:
+  mariadb-storage:
